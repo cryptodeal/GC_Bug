@@ -1,6 +1,6 @@
 #include <cstdlib>
 
-static std::unordered_set<void *> alreadyDestroyed;
+static std::unordered_set<float *> alreadyDestroyed;
 
 extern "C"
 {
@@ -20,15 +20,18 @@ extern "C"
     }
   }
 
-  void *deallocationCtx()
-  {
-    return &alreadyDestroyed;
-  }
-
   void dispose(void *t)
   {
     auto *buffer = reinterpret_cast<float *>(t);
     alreadyDestroyed.insert(buffer);
     delete buffer;
+  }
+
+  typedef void (*JSTypedArrayBytesDeallocator)(void *bytes,
+                                               void *deallocatorContext);
+
+  JSTypedArrayBytesDeallocator genBufferDestroyer()
+  {
+    return destroyBuffer;
   }
 }
