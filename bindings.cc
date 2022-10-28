@@ -1,9 +1,15 @@
 #include <cstdlib>
+#include <unordered_set>
 
 static std::unordered_set<float *> alreadyDestroyed;
 
 extern "C"
 {
+
+  void* createBuffer(int64_t numel) {
+    // this is weird but technically correct C++ syntax, don't copy this lol
+    return new float[numel]();
+  }
 
   void destroyBuffer(void *t, void * /*ignore*/)
   {
